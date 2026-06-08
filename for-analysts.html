@@ -204,8 +204,8 @@
   <span class="chip chip-orange" style="margin-bottom:20px;display:inline-flex;">For SEBI-Registered Research Analysts</span>
   <h1>Scale your research<br>&amp; advisory practice</h1>
   <p class="lead">Stoxify gives SEBI-registered Research Analysts a complete platform to publish real-time trade ideas, grow a subscriber base, and build a scalable advisory practice.</p>
-  <form class="wl-form" id="hero-form" onsubmit="handleWL(event,'hero-ok')">
-    <input type="email" placeholder="Enter your work email" required>
+  <form class="wl-form" id="hero-form" name="waitlist" data-netlify="true" onsubmit="handleWL(event,'hero-ok')">
+    <input type="email" name="email" placeholder="Enter your work email" required>
     <button type="submit">Join the Waitlist &rarr;</button>
   </form>
   <div id="hero-ok" class="wl-success">&check; You&rsquo;re on the list! We&rsquo;ll reach out when we launch.</div>
@@ -515,8 +515,8 @@
     <span class="chip chip-orange" style="margin-bottom:20px;display:inline-flex;">Early Access &mdash; Founding Batch</span>
     <h2 class="reveal">Be among the first Research Analysts<br>on Stoxify</h2>
     <p class="lead wl-final reveal d2">We&rsquo;re onboarding our founding batch of SEBI-registered RAs. Get priority access, founding member benefits, and zero platform fee for your first 3 months.</p>
-    <form class="wl-form reveal d3" id="final-form" onsubmit="handleWL(event,'final-ok')">
-      <input type="email" placeholder="Enter your work email" required>
+    <form class="wl-form reveal d3" id="final-form" name="waitlist" data-netlify="true" onsubmit="handleWL(event,'final-ok')">
+      <input type="email" name="email" placeholder="Enter your work email" required>
       <button type="submit">Join the Waitlist &rarr;</button>
     </form>
     <div id="final-ok" class="wl-success">&check; You&rsquo;re on the list! We&rsquo;ll reach out when we launch.</div>
@@ -581,8 +581,20 @@
 <script>
 function handleWL(e, successId) {
   e.preventDefault();
-  e.target.style.display = 'none';
-  document.getElementById(successId).style.display = 'block';
+  const form = e.target;
+  const formData = new FormData(form);
+  formData.append("form-name", form.getAttribute("name"));
+  
+  fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(formData).toString(),
+  })
+  .then(() => {
+    form.style.display = 'none';
+    document.getElementById(successId).style.display = 'block';
+  })
+  .catch((error) => console.error("Error submitting form:", error));
 }
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
